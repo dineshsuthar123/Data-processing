@@ -1,4 +1,4 @@
-#!/usr/bin/env pwsh
+ nges#!/usr/bin/env pwsh
 # Comprehensive API Test Script for Finance Backend
 
 Write-Host "╔════════════════════════════════════════════════════════════════════╗" -ForegroundColor Cyan
