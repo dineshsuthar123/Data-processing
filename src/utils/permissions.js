@@ -4,7 +4,7 @@
 
 const ROLE_PERMISSIONS = {
   VIEWER: {
-    canViewRecords: false,
+    canViewRecords: true,
     canCreateRecords: false,
     canUpdateRecords: false,
     canDeleteRecords: false,
