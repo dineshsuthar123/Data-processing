@@ -12,6 +12,7 @@ module.exports = {
   DB_USER: process.env.DB_USER || 'postgres',
   DB_PASSWORD: process.env.DB_PASSWORD || 'postgres',
   DB_DIALECT: process.env.DB_DIALECT || 'postgres',
+  DB_STORAGE: process.env.DB_STORAGE || './finance.db',
   
   // JWT
   JWT_SECRET: process.env.JWT_SECRET || 'your-secret-key-change-in-production',

@@ -42,7 +42,46 @@ app.use((req, res) => {
 });
 
 // Error handling middleware
+// Error handling middleware
 app.use(errorHandler);
+
+// Initialize default roles and users
+const initializeData = async () => {
+  try {
+    // Create default roles if they don't exist
+    const roles = ['VIEWER', 'ANALYST', 'ADMIN'];
+    for (const roleName of roles) {
+      await db.Role.findOrCreate({ where: { name: roleName } });
+    }
+    console.log('Default roles initialized');
+
+    // Create default test users if they don't exist
+    const bcrypt = require('bcrypt');
+    const testUsers = [
+      { email: 'admin@finance.local', password: 'admin123', firstName: 'Admin', role: 'ADMIN' },
+      { email: 'analyst@finance.local', password: 'admin123', firstName: 'Analyst', role: 'ANALYST' },
+      { email: 'viewer@finance.local', password: 'admin123', firstName: 'Viewer', role: 'VIEWER' },
+    ];
+
+    for (const testUser of testUsers) {
+      const [user, created] = await db.User.findOrCreate({
+        where: { email: testUser.email },
+        defaults: {
+          email: testUser.email,
+          password: await bcrypt.hash(testUser.password, 10),
+          firstName: testUser.firstName,
+          lastName: 'User',
+          roleId: (await db.Role.findOne({ where: { name: testUser.role } })).id,
+        },
+      });
+      if (created) {
+        console.log(`Created test user: ${testUser.email}`);
+      }
+    }
+  } catch (error) {
+    console.error('Error initializing data:', error);
+  }
+};
 
 // Database connection and server start
 const startServer = async () => {
@@ -54,6 +93,9 @@ const startServer = async () => {
     // Sync database
     await db.sequelize.sync({ alter: env.NODE_ENV === 'development' });
     console.log('Database synced');
+
+    // Initialize default data
+    await initializeData();
 
     // Start server
     const PORT = env.PORT;

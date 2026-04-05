@@ -5,6 +5,19 @@ const env = require('../config/environment');
 const { BadRequestError, ConflictError, NotFoundError } = require('../utils/errors');
 
 /**
+ * Ensure default roles exist
+ */
+const ensureDefaultRoles = async () => {
+  const roles = ['VIEWER', 'ANALYST', 'ADMIN'];
+  for (const roleName of roles) {
+    const existingRole = await db.Role.findOne({ where: { name: roleName } });
+    if (!existingRole) {
+      await db.Role.create({ name: roleName });
+    }
+  }
+};
+
+/**
  * Register a new user
  */
 const register = async (email, password, firstName, lastName) => {
@@ -16,8 +29,15 @@ const register = async (email, password, firstName, lastName) => {
 
   const hashedPassword = await bcrypt.hash(password, 10);
 
+  // Ensure roles exist
+  await ensureDefaultRoles();
+
   // Default role is VIEWER
   const viewerRole = await db.Role.findOne({ where: { name: 'VIEWER' } });
+
+  if (!viewerRole) {
+    throw new Error('VIEWER role could not be created');
+  }
 
   const user = await db.User.create({
     email,
